@@ -1,0 +1,23 @@
+{
+  "name": "prueba-qa-mercadolibre",
+  "version": "1.0.0",
+  "description": "Prueba técnica QA - Lite Thinking",
+  "main": "index.js",
+  "scripts": {
+    "test:selenium": "node selenium-tests/flujo-completo.js",
+    "test:cypress": "cypress run",
+    "test:cypress:open": "cypress open",
+    "test:load": "k6 run load-tests/prueba-carga.js",
+    "lighthouse": "lighthouse https://www.mercadolibre.com.co --output html --output-path ./lighthouse-reports/reporte.html"
+  },
+  "keywords": ["qa", "testing", "automation"],
+  "author": "Miguel Bahamon",
+  "license": "ISC",
+  "dependencies": {
+    "selenium-webdriver": "^4.16.0",
+    "chromedriver": "^120.0.0"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.2"
+  }
+}

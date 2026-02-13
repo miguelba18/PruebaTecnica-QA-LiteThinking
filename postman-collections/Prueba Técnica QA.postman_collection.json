@@ -1,0 +1,428 @@
+{
+	"info": {
+		"_postman_id": "2963c7eb-c443-4fe4-a1f6-eded2a797819",
+		"name": "Prueba Técnica QA",
+		"description": "Colección de pruebas de API REST sobre MercadoLibre Colombia.  \nCubre métodos GET, POST, PUT, DELETE con datos válidos e inválidos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34076539"
+	},
+	"item": [
+		{
+			"name": "01-Autenticacion",
+			"item": [
+				{
+					"name": "Login valido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 201 - Login exitoso\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Respuesta contiene token\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"token\");",
+									"    pm.expect(json.token).to.be.a(\"string\");",
+									"    pm.expect(json.token.length).to.be.greaterThan(0);",
+									"});",
+									"",
+									"// Guardar token para requests autenticados",
+									"const json = pm.response.json();",
+									"pm.environment.set(\"access_token\", json.token);",
+									"console.log(\"Token guardado:\", json.token);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"johnd\",\n    \"password\": \"m38rmF$\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02-Productos",
+			"item": [
+				{
+					"name": "Todos los productos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 - Productos obtenidos\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Tiempo de respuesta menor a 3000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+									"});",
+									"",
+									"pm.test(\"Respuesta es un array\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.be.an(\"array\");",
+									"});",
+									"",
+									"pm.test(\"Array tiene productos\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.length).to.be.greaterThan(0);",
+									"});",
+									"",
+									"pm.test(\"Cada producto tiene campos requeridos\", function () {",
+									"    const json = pm.response.json();",
+									"    json.slice(0, 3).forEach(product => {",
+									"        pm.expect(product).to.have.property(\"id\");",
+									"        pm.expect(product).to.have.property(\"title\");",
+									"        pm.expect(product).to.have.property(\"price\");",
+									"        pm.expect(product).to.have.property(\"category\");",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Productos por categoria",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 - Categoría encontrada\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Resultados son de electrónica\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.be.an(\"array\");",
+									"    json.forEach(product => {",
+									"        pm.expect(product.category).to.eql(\"electronics\");",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"Tiene al menos un producto\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.length).to.be.greaterThan(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/category/electronics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"category",
+								"electronics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Nuevo Producto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 - Producto creado\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Respuesta contiene ID generado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"id\");",
+									"});",
+									"",
+									"pm.test(\"Título coincide con el enviado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.title).to.eql(\"Laptop Dell Inspiron 15\");",
+									"});",
+									"",
+									"pm.test(\"Precio coincide con el enviado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.price).to.eql(2500000);",
+									"});",
+									"",
+									"// Guardar ID del producto creado",
+									"const json = pm.response.json();",
+									"pm.environment.set(\"nuevo_product_id\", json.id);",
+									"console.log(\"Nuevo producto ID:\", json.id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Laptop Dell Inspiron 15\",\n    \"price\": 2500000,\n    \"description\": \"Laptop Dell Inspiron 15 pulgadas, 16GB RAM, 512GB SSD\",\n    \"image\": \"https://i.pravatar.cc/150\",\n    \"category\": \"electronics\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Producto Completo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 - Producto actualizado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"ID del producto se mantiene\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.id).to.eql(parseInt(pm.environment.get(\"product_id\")));",
+									"});",
+									"",
+									"pm.test(\"Título fue actualizado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.title).to.eql(\"Laptop Dell Inspiron 15 - Actualizada\");",
+									"});",
+									"",
+									"pm.test(\"Precio fue actualizado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.price).to.eql(2800000);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Laptop Dell Inspiron 15 - Actualizada\",\n    \"price\": 2800000,\n    \"description\": \"Versión actualizada con más memoria RAM\",\n    \"image\": \"https://i.pravatar.cc/150\",\n    \"category\": \"electronics\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Producto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 - Producto eliminado\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Respuesta contiene datos del producto eliminado\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"id\");",
+									"    pm.expect(json.id).to.eql(parseInt(pm.environment.get(\"product_id\")));",
+									"});",
+									"",
+									"pm.test(\"Producto tenía título antes de eliminar\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.title).to.be.a(\"string\");",
+									"    pm.expect(json.title.length).to.be.greaterThan(0);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03-carrito",
+			"item": [
+				{
+					"name": "Carrito del usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 - Carrito obtenido\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Respuesta es array de carritos\", function () {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.be.an(\"array\");",
+									"});",
+									"",
+									"pm.test(\"Carrito tiene estructura correcta\", function () {",
+									"    const json = pm.response.json();",
+									"    if (json.length > 0) {",
+									"        pm.expect(json[0]).to.have.property(\"id\");",
+									"        pm.expect(json[0]).to.have.property(\"userId\");",
+									"        pm.expect(json[0]).to.have.property(\"products\");",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/carts/user/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts",
+								"user",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"",
+					"console.log(\"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\");",
+					"console.log(\"Request:\", pm.info.requestName);",
+					"console.log(\"Status:\", pm.response.code);",
+					"console.log(\"Tiempo:\", pm.response.responseTime + \"ms\");",
+					"console.log(\"Tamaño:\", pm.response.responseSize + \" bytes\");",
+					"console.log(\"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\");",
+					"",
+					"pm.test(\"Respuesta no está vacía\", function () {",
+					"    pm.expect(pm.response.text()).to.not.be.empty;",
+					"});"
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,283 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_INFLUXDB-K6",
+      "label": "InfluxDB-K6",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "influxdb",
+      "pluginName": "InfluxDB"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "8.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "influxdb",
+      "name": "InfluxDB",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "graph",
+      "name": "Graph",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "description": "Dashboard de métricas K6 - Prueba Técnica QA",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "${DS_INFLUXDB-K6}",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1000 },
+              { "color": "red", "value": 3000 }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "reduceOptions": {
+          "calcs": ["mean"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "title": "Tiempo Promedio de Respuesta",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT mean(\"value\") FROM \"http_req_duration\" WHERE $timeFilter",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": "${DS_INFLUXDB-K6}",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.01 },
+              { "color": "red", "value": 0.05 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": {
+        "reduceOptions": {
+          "calcs": ["mean"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "title": "Tasa de Errores",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT mean(\"value\") FROM \"http_req_failed\" WHERE $timeFilter",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": "${DS_INFLUXDB-K6}",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 100 }
+            ]
+          },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "options": {
+        "reduceOptions": {
+          "calcs": ["mean"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "title": "Peticiones por Segundo",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT mean(\"value\") FROM \"http_reqs\" WHERE $timeFilter",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": "${DS_INFLUXDB-K6}",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 25 },
+              { "color": "red", "value": 50 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "options": {
+        "reduceOptions": {
+          "calcs": ["max"],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background"
+      },
+      "title": "Usuarios Virtuales Máximos",
+      "type": "stat",
+      "targets": [
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT max(\"value\") FROM \"vus\" WHERE $timeFilter",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": "${DS_INFLUXDB-K6}",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 4 },
+      "id": 5,
+      "options": {
+        "tooltip": { "mode": "single" }
+      },
+      "title": "Tiempo de Respuesta HTTP en el Tiempo",
+      "type": "graph",
+      "targets": [
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT mean(\"value\") FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "refId": "A",
+          "alias": "Promedio"
+        },
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT percentile(\"value\", 95) FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "refId": "B",
+          "alias": "Percentil 95"
+        }
+      ]
+    },
+    {
+      "datasource": "${DS_INFLUXDB-K6}",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "id": 6,
+      "title": "Usuarios Virtuales en el Tiempo",
+      "type": "graph",
+      "targets": [
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT mean(\"value\") FROM \"vus\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "refId": "A",
+          "alias": "VUs Activos"
+        }
+      ]
+    },
+    {
+      "datasource": "${DS_INFLUXDB-K6}",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "id": 7,
+      "title": "Tasa de Errores en el Tiempo",
+      "type": "graph",
+      "targets": [
+        {
+          "datasource": "${DS_INFLUXDB-K6}",
+          "query": "SELECT mean(\"value\") FROM \"http_req_failed\" WHERE $timeFilter GROUP BY time($__interval) fill(null)",
+          "refId": "A",
+          "alias": "Tasa Errores"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": ["k6", "performance", "qa"],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "K6 Performance Testing - MercadoLibre QA",
+  "uid": "k6-mercadolibre-qa",
+  "version": 1
+}
